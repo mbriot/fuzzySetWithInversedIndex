@@ -1,16 +1,22 @@
-var indexer = (function(){
+var decatIndex = (function(){
   
-  var Indexer = function() {
-    this.test = "test";
+
+  var Index = function(fieldsToIndex,fieldsToStore) {
+    this.fieldsToIndex = fieldsToIndex;
+    this.fieldsToStore = fieldsToStore;
     this.index = {};
     this.store = {};
     this.fuzzySet = FuzzySet();
   };
 
-  Indexer.prototype.indexDoc = function(doc) {
+  Index.prototype.indexDoc = function(doc) {
     var self = this;
     for (var key in doc) {
-      if (doc.hasOwnProperty(key) && key !== "id") {
+       if(key === "id") var id = doc[key]
+    }
+
+    for (var key in doc) {
+      if (doc.hasOwnProperty(key) && this.fieldsToIndex.indexOf(key) != -1 && key !== "id") {
         var tokens = doc[key].split(" ").map(function(token){
           return token.toLowerCase();
         });
@@ -25,10 +31,21 @@ var indexer = (function(){
           self.index[token].push(doc["id"]);
         });
       }
+
+      if (doc.hasOwnProperty(key) && this.fieldsToStore.indexOf(key) != -1 && key !== "id") {
+        if(self.store[id]){
+          self.store[id].push(key : doc[key])  
+        } else {
+          self.store[id] = {id : id, values : []};
+          self.store[id].push(key : doc[key])
+        }
+        
+        
+      }
     }
   };
 
-  Indexer.prototype.search = function(str){
+  Index.prototype.search = function(str){
     var self = this;
     var documentsByToken = [];
     var tokens = str.split(" ").map(function(element){
@@ -47,23 +64,27 @@ var indexer = (function(){
     return finalResult;
   };
 
-  return {Indexer : Indexer};
+  return {Index : Index} ;
 })();
 
-var indexer = new indexer.Indexer();
-var docs = [];
-docs.push({id : 1, name : "ballon champions league",color:"jaune",sport : "football"});
-docs.push({id : 2, name : "ballon coupe du monde",color:"rouge",sport : "football"});
-docs.forEach(function(doc){indexer.indexDoc(doc)});
+var idx = new decatIndex.Index(['color','sport','type','brandName'],['name','imageUrl'])
+//var idx = decatIndex()
 
-$(document).ready(function(e) {   
+var docs = [];
+docs.push({id : 1, name : "Maillot football enfant F300 blanc",imageUrl : "decathlon.fr/media/832/8327269/classic_c31bae38d50f4d3aa72689edea9e7c8a.jpg",color:"blanc",sport : "football",type : "maillot",brandName : "kipsta"});
+docs.push({id : 2, name : "Maillot football enfant Entrada blanc",imageUrl : "decathlon.fr/media/837/8370157/classic_aa58a99fee7943908bf34a62877c53bb.jpg",color:"blanc",sport : "football",type : "maillot",brandName : "adidas"});
+docs.forEach(function(doc){
+  idx.indexDoc(doc)
+});
+
+$(document).ready(function(e) {
   
   var $productsFilter = $( "#products-filter" );
   
   $productsFilter.bind("keyup",function(e){
     fieldValue = $productsFilter.val();
 
-    var results = indexer.search(fieldValue); 
+    var results = idx.search(fieldValue); 
     console.log({'results' : results});
   });
 });
