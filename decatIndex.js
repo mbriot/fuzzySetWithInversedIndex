@@ -47,8 +47,12 @@
     });
     tokens.forEach(function(token){
       var fuzzySetResults = self.fuzzySet.get(token);
-      documentsByToken.push(self.index[fuzzySetResults[0][1]]);
+      if(fuzzySetResults !== null)
+        documentsByToken.push(self.index[fuzzySetResults[0][1]]);
     });
+
+    if(documentsByToken.length == 0) return [];
+    
     var finalResult = documentsByToken.reduce(function(previous,current){
         return previous.filter(function(e){
           if(current.indexOf(e) != -1) return true;
