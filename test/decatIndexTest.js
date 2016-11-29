@@ -54,10 +54,16 @@ QUnit.test( "should serialized and rebuild index correctly", function( assert ) 
 	idx.indexDoc({id:"1",title : "house of pain"})
 	idx.indexDoc({id:"2",title : "house of mickey"})
 	idx.indexDoc({id:"3",title : "horse of mickey"})
-	
+
 	var serializedIndex = idx.toJson()
-	var newIdx = new DecatIndex()
-	newIdx.load(serializedIndex)
+	var newIdx = new DecatIndex({
+		ref : serializedIndex.ref,
+		index : serializedIndex.index,
+		store : serializedIndex.store,
+		fieldsToIndex : serializedIndex.fieldsToIndex,
+		fieldsToStore : serializedIndex.fieldsToStore,
+		dictionary : serializedIndex.dictionary
+	})
 	var results = newIdx.search("house mickey")
 
 	assert.ok( results.length == "1")

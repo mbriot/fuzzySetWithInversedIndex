@@ -4,9 +4,10 @@
     this.ref = options.ref;
     this.fieldsToIndex = options.fieldsToIndex;
     this.fieldsToStore = options.fieldsToStore;
-    this.index = {};
-    this.store = {};
-    this.fuzzySet = FuzzySet();
+    this.index = options.index || {};
+    this.store = options.store || {};
+    this.dictionary = new Set();
+    this.fuzzySet = (options.dictionary && options.dictionary.size > 0) ? FuzzySet(Array.from(options.dictionary)) : FuzzySet();
   };
 
   Index.prototype.indexDoc = function(doc) {
@@ -22,6 +23,7 @@
         });
       
         tokens.forEach(function(token){
+          self.dictionary.add(token);
           self.fuzzySet.add(token);
           var existingValues = self.index[token];
           if(existingValues === undefined){
@@ -69,13 +71,23 @@
     return {
       ref : this.ref,
       index : this.index,
-      store : this.store
+      store : this.store,
+      fieldsToIndex : this.fieldsToIndex,
+      fieldsToStore : this.fieldsToStore,
+      dictionary : this.dictionary
     }
   };
 
   Index.prototype.load = function(serializedIndex){
     var indexFromJson = JSON.parse(serializedIndex);
-    var idx = new Index();
+    return new Index({
+      ref : indexFromJson.ref,
+      index : indexFromJson.index,
+      store : indexFromJson.store,
+      fieldsToStore : indexFromJson.fieldsToStore,
+      fieldsToIndex : indexFromJson.fieldsToIndex,
+      dictionary : this.dictionary
+    });
   };
 
   return window.DecatIndex = Index;
