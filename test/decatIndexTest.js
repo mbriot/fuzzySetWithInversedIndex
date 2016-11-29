@@ -36,3 +36,30 @@ QUnit.test( "search two words one matching but not the other", function( assert 
 
 	assert.ok( results.length == "0")
 });
+
+QUnit.test( "search two words in three docs with only one matching doc", function( assert ) {
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['title']})
+	idx.indexDoc({id:"1",title : "house of pain"})
+	idx.indexDoc({id:"2",title : "house of mickey"})
+	idx.indexDoc({id:"3",title : "horse of mickey"})
+	
+	var results = idx.search("house mickey")
+
+	assert.ok( results.length == "1")
+	assert.ok( results[0] == "2", "Passed!" )
+});
+
+QUnit.test( "should serialized and rebuild index correctly", function( assert ) {
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['title']})
+	idx.indexDoc({id:"1",title : "house of pain"})
+	idx.indexDoc({id:"2",title : "house of mickey"})
+	idx.indexDoc({id:"3",title : "horse of mickey"})
+	
+	var serializedIndex = idx.toJson()
+	var newIdx = new DecatIndex()
+	newIdx.load(serializedIndex)
+	var results = newIdx.search("house mickey")
+
+	assert.ok( results.length == "1")
+	assert.ok( results[0] == "2", "Passed!" )
+});

@@ -47,8 +47,11 @@
     });
     tokens.forEach(function(token){
       var fuzzySetResults = self.fuzzySet.get(token);
-      if(fuzzySetResults !== null)
+      if(fuzzySetResults !== null) {
         documentsByToken.push(self.index[fuzzySetResults[0][1]]);
+      } else {
+        documentsByToken.push([]);
+      }
     });
 
     if(documentsByToken.length == 0) return [];
@@ -68,6 +71,11 @@
       index : this.index,
       store : this.store
     }
+  };
+
+  Index.prototype.load = function(serializedIndex){
+    var indexFromJson = JSON.parse(serializedIndex);
+    var idx = new Index();
   };
 
   return window.DecatIndex = Index;
