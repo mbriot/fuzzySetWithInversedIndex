@@ -11,7 +11,7 @@ QUnit.test( "search one word that should match", function( assert ) {
 
 QUnit.test( "search one word with no match", function( assert ) {
 	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['content']})
-	idx.indexDoc({id:"1",title : "undefined is not a function",content : "js is a mess !"})
+	idx.indexDoc({id:"1",title : "toto is not a function",content : "js is a mess !"})
 	
 	var results = idx.search("house")
 
@@ -68,4 +68,15 @@ QUnit.test( "should serialized and rebuild index correctly", function( assert ) 
 
 	assert.ok( results.length == "1")
 	assert.ok( results[0] == "2", "Passed!" )
+});
+
+QUnit.test( "should store doc ref in index with gamma transformation", function( assert ) {
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['title']})
+	idx.indexDoc({id:"1",title : "house"})
+	idx.indexDoc({id:"3",title : "house"})
+	idx.indexDoc({id:"7",title : "house"})
+	idx.indexDoc({id:"12",title : "house"})
+
+	assert.deepEqual(idx.index['house'],[1,2,4,5])
+	assert.deepEqual(idx.search("house"),[1,3,7,12])
 });
