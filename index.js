@@ -1,1 +1,1 @@
-module.exports = require('./decatIndex.js');
+module.exports = require('./build/decatIndex.min.js');

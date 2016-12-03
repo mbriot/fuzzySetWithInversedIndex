@@ -1,0 +1,10 @@
+
+	var root = this;
+	if (typeof module !== 'undefined' && module.exports) {
+	    module.exports = DecatIndex;
+	    root.DecatIndex = DecatIndex;
+	} else {
+	    root.DecatIndex = DecatIndex;
+	}
+
+})();
