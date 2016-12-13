@@ -1,3 +1,18 @@
+QUnit.test( "should be able to find a range of integer", function( assert ) {
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : [{'title','string'},{'price','integer'}], fieldsToStore : ['title','price']})
+	idx.indexDoc({id:"1",title : "a",price : "5.99"})
+	idx.indexDoc({id:"2",title : "b",price : "11"})
+	idx.indexDoc({id:"3",title : "b",price : "12.50"})
+	idx.indexDoc({id:"4",title : "c",price : "17.9"})
+	idx.indexDoc({id:"5",title : "d",price : "22"})
+
+	var results = idx.search("price:[12:18]")
+
+	assert.ok( results.length == "2" )
+	assert.ok( results[0].id == "3" )
+	assert.ok( results[0].id == "4" )
+});
+
 QUnit.test( "search one word that should match", function( assert ) {
 	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['author','content']})
 	idx.indexDoc({id:"1",title : "about yellow socks",content : "yellow socks are the bests !"})
