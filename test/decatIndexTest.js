@@ -9,12 +9,12 @@ QUnit.test( "should be able to find a range of integer", function( assert ) {
 
 	var results = idx.search("  price:[12:18]  ")
 
-	assert.equal( results.length , "2" )
+	assert.equal( results.length , 2 )
 	assert.equal( results[0].id , "3" )
 	assert.equal( results[0].id , "4" )
 });
 
-QUnit.test( "should be able to find a range of integer and another string field", function( assert ) {
+QUnit.skip( "should be able to find a range of integer and another string field", function( assert ) {
 	var idx = new DecatIndex({ref : "id", fieldsToIndex : [{name:'title',type:'string'},{name:'price',type:'integer'}],
 	 fieldsToStore : ['title','price']})
 	idx.indexDoc({id:"1",title : "a",price : "5.99"})
@@ -30,7 +30,7 @@ QUnit.test( "should be able to find a range of integer and another string field"
 });
 
 QUnit.skip( "search one word that should match", function( assert ) {
-	var idx = new DecatIndex({ref : "id", fieldsToIndex : ['title'], fieldsToStore : ['author','content']})
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : [{name:'title',type:'string'}], fieldsToStore : ['author','content']})
 	idx.indexDoc({id:"1",title : "about yellow socks",content : "yellow socks are the bests !"})
 	idx.indexDoc({id:"2",title : "about red socks",content : "red socks are the bests !"})
 
@@ -38,6 +38,20 @@ QUnit.skip( "search one word that should match", function( assert ) {
 
 	assert.ok( results.length == "1" )
 	assert.ok( results[0].id == "2" )
+});
+
+QUnit.skip( "should match even with wrong case", function( assert ) {
+	var idx = new DecatIndex({ref : "id", fieldsToIndex : [{name:'title',type:'string'}], fieldsToStore : ['author','content']})
+	idx.indexDoc({id:"1",title : "about yElLoW socks",content : "yellow socks are the bests !"})
+	idx.indexDoc({id:"2",title : "about red socks",content : "red socks are the bests !"})
+
+	var results = idx.search("yellow")
+	assert.ok( results.length == "1" )
+	assert.ok( results[0].id == "1" )
+
+	results = idx.search("YeLlOw")
+	assert.ok( results.length == "1" )
+	assert.ok( results[0].id == "1" )
 });
 
 QUnit.skip( "search one word with no match", function( assert ) {
